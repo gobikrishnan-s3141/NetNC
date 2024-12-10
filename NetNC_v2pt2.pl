@@ -29,10 +29,10 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 
-use lib '/path/to/directory/netNC/modules/'; # EDIT THIS LINE TO INDICATE THE PATH TO NetNC MODULES DIRECTORY
-use lib "/path/to/the/perl/modules/directory/";  # EDIT THIS LINE TO INDICATE THE PATH TO THE PERL MODULES DIRECTORY CONTAINING Math::Pari (e.g. /usr/lib/perl5/site_perl/5.18.1/x86_64-linux-thread-multi/)
-my $path_to_R = "/path/to/R"; ## EDIT THIS LINE TO INDICATE THE PATH TO YOUR R INSTALLATION (e.g. /usr/bin/R)
-my $NetNC_home = "/path/to/directory/netNC/"; ## EDIT THIS LINE TO PROVIDE THE PATH TO THE DIRECTORY WHERE YOU HAVE THIS NETNC SCRIPT AND FCS.pl
+use lib '/usr/local/bin/NetNC/modules/';
+use lib "/usr/lib/perl5/site_perl/5.26.1/x86_64-linux-thread-multi";
+my $path_to_R = "/usr/bin/R";
+my $NetNC_home = "/usr/local/bin/NetNC/";
 
 use strict;
 use NetNC;
