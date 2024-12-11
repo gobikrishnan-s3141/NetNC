@@ -8,20 +8,25 @@ if not, see <http://www.gnu.org/licenses/>.
 ## QUICK START GUIDE
 
 1) Ensure the dependencies are installed:
-a. Perl - Math::Pari
-b. R
-c. Python - networkx 1.8 and numpy
+	a. Perl - Math::Pari
+	b. R
+	c. Python - networkx 1.8 and numpy
 
-2) Edit the paths at the top of NetNC_v2pt2.pl (the relevant lines have comments # EDIT THIS ...)
+3) Edit the paths at the top of NetNC_v2pt2.pl (the relevant lines have comments # EDIT THIS ...)
 
-3) Run the NetNC_v2pt2.pl script with relevant options, the two main modes are given below.
+4) Run the NetNC_v2pt2.pl script with relevant options, the two main modes are given below.
+
 a. 'FTI' analysis mode:
+```
 NetNC_v2pt2.pl -n MyNetwork.txt -i NodeList.txt -o /path/to/my/outdir/fileprefix -F
+```
 
 The final output (an edge list) will be in the file: /path/to/my/outdir/fileprefix.FDRthresholded_mincutDensity0pt306_noDoublets.txt
 
 b. 'FBT' analysis mode:
+```
 NetNC_v2pt2.pl -n MyNetwork.txt -i NodeList.txt -o /path/to/my/outdir/fileprefix -M
+```
 
 The final output as a node list will be located at: /path/to/my/outdir/fileprefix_NFCS-mixturemodel.coherentNodes
 Additionally, a network from the coherent nodes in the above file and where edges have bonferroni 
@@ -37,6 +42,7 @@ includes description of output files.
 The final two sections summarise contributors and how to cite NetNC.
 
 The NetNC distribution includes three main components:
+
 1) Network Neighbourhood Clustering - NetNC_v2pt2.pl
 
 This program runs Network Neighbourhood Clustering and optionally
@@ -77,6 +83,7 @@ install Math::Pari
 ```
 
 b) In the NetNC_v2pt2.pl edit the 'use lib' statements to include:
+
 i) the path to Math::Pari (typically this will be where cpan installs
 perl modules) and ii) the full path to the NetNC modules/ (this is the 'modules' 
 directory created when you unzipped the NetNC distribution).
@@ -146,14 +153,15 @@ This subsection describes components of the analysis that may be called separate
 
 The script FCS.pl takes as input the genelist and the file written by NetNC with 
 the suffix ".FG.id1_id2_nlp.txt". For example:
+```
 FCS.pl input_genelist NetNC_results.FG.id1_id2_nlp.txt FCS_outputFile.txt
-
+```
 FCS.pl output has the format: Node edgePvalueSum degree degree-normalised_edgePvalueSum
 
 Gaussian mixture modelling can be run with the NetNCmixmodel.R script as follows:
-
+```
 R --slave --no-save --args FCS_output.txt output_file NetNC_home_directory < NetNC_home_directory/mixtureModelling/NetNCmixmodel.R
-
+```
 The 'NetNC_home_directory' is the directory where NetNC_v2pt2.pl and FCS.pl are located. 
 
 NetNCmixmodel.R runs mixture modelling on the NFCS scores written by FCS.pl
@@ -186,9 +194,9 @@ is working correctly.
 1. The tests may be run as follows (from the netNC/ directory):
 
 a) Network Neighbourhood Clustering (NNC)
-
+```
 NetNC_v2pt2.pl -i test/test_genelist.txt -n test/network/test_net.txt -o test/output/NNConly/NNCz10 -z 10
-
+```
 This usually runs in less than one minute.
 
 Please note: the above command runs 10 resamples (-z 10); however, at 
@@ -196,9 +204,9 @@ least 100 resamples are recommended for general use (more samples enable
 greater precision for estimation of pFDR).
 
 b) Node-centric Analysis mode:
-
+```
 NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/output/NodeCentric/NodeCent_z10 -M -p test/output/NNConly/NNCz10.BG.nlPonly.txt -z 10
-
+```
 Typically takes less than three minutes to complete.
 
 This command is also an example of using the background p-value distribution generated
@@ -209,15 +217,17 @@ specified, the default number of resamples (100) is assumed and a warning messag
 issued.
 
 c) Functional Target Identification mode:
+```
 NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/output/FTI/FTIz10 -z 10 -F
-
+```
 Runtime is around 15 minutes. This mode calculates NNC and runs the iterative minimum
 cut, applying pFDR and network density thresholds optimised for the Functional Target 
 Identification (FTI) task.
 
 d) Pathway Identification mode and node-centric analysis:
+```
 NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/output/PID/PID_NodeCent_z10 -z10 -E -M -l test/test_background_genelist.txt
-
+```
 Usually takes about 15 minutes to compute. This mode calculates NNC and runs the iterative
 minimum cut, applying pFDR and network density thresholds optimised for the Pathway 
 Identification (PID) task. This command also includes an example of using the -l option
@@ -229,8 +239,9 @@ At present, no warning is given by NetNC if the -i (input) node list is not a su
 the -l (background) node list.
 
 e) Iterative minimum cut in standalone mode:
-
+```
 python mincut/itercut.py -i test/output/NNConly/NNCz10.FDRthresholded_pairs.txt -o test/output/mincutOnly/NNCz10_FDR0pt1_mincutThresh0pt1.txt -t 0.1
+```
 
 Runtime is usually 10 minutes. This command depends on test a) above having
 successfully completed.
