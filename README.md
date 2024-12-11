@@ -1,9 +1,9 @@
 # README for Network Neighbourhood Clustering (NetNC) software
 
-## Licensed under the GNU General Public License (GPL) version 3
-## you should have recieved a copy of the GNU General Public License
-## with the NetNC software in the file LICENSE.txt
-## if not, see <http://www.gnu.org/licenses/>.
+Licensed under the GNU General Public License (GPL) version 3
+ou should have recieved a copy of the GNU General Public License
+with the NetNC software in the file LICENSE.txt
+if not, see <http://www.gnu.org/licenses/>.
 
 ## QUICK START GUIDE
 
