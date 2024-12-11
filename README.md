@@ -1,15 +1,11 @@
-##
-## README for Network Neighbourhood Clustering (NetNC) software
-##
+# README for Network Neighbourhood Clustering (NetNC) software
 
 ## Licensed under the GNU General Public License (GPL) version 3
 ## you should have recieved a copy of the GNU General Public License
 ## with the NetNC software in the file LICENSE.txt
 ## if not, see <http://www.gnu.org/licenses/>.
 
-##
 ## QUICK START GUIDE
-##
 
 1) Ensure the dependencies are installed:
 a. Perl - Math::Pari
@@ -33,9 +29,7 @@ corrected -log(p)<=0.05 is output to: /path/to/my/outdir/fileprefix_NFCS-mixture
 
 Please see further details below.
 
-##
 ## INTRODUCTION
-##
 
 In this README, the usage and testing sections provide examples of 
 some ways to run NetNC and its components. The testing section also 
@@ -71,17 +65,16 @@ provides functions for the NetNCmixmodel.R script. A little more detail is given
 in the usage section, below.
 
 
-
-##
 ## INSTALLATION
-##
 
 1. Network Neighbourhood clustering - NetNC_v2pt2.pl
 
 a) The arbitary precision calculations require the perl module Math::Pari.
 Install this from cpan (www.cpan.org). For example from the command line:
+```
 cpan
 install Math::Pari
+```
 
 b) In the NetNC_v2pt2.pl edit the 'use lib' statements to include:
 i) the path to Math::Pari (typically this will be where cpan installs
@@ -97,12 +90,9 @@ script. NetNC has been tested with perl v5.16, v5.18, v5.20 and v5.26
 
 2. Iterative Minimum cut - itercut.py
 
-Install the dependencies: networkx 1.8 and numpy 
+Install the dependencies: networkx>=1.8 and numpy 
 
-For example: easy_install networkx==1.8
-	     easy_install numpy
-
-(itercut.py is verified to work with networkx 1.8. Earlier versions are 
+(itercut.py is verified to work with networkx >=1.8. Earlier versions are 
 not compatible)
 
 More information is given in mincut/MinCut_README.txt
@@ -112,10 +102,7 @@ tested with R versions 3.0.2, 3.2.2, 3.3.0, 3.3.1, 3.6.3 on Linux, but is expect
 to work on Mac OSX, Windows and with other recent versions of R.
 
 
-
-##
 ## USAGE
-##
 
 1. NetNC
 
@@ -191,9 +178,7 @@ al. BMC Systems Biology 5, Article number: 68 (2011) and is available from the l
 https://static-content.springer.com/esm/art%3A10.1186%2F1752-0509-5-68/MediaObjects/12918_2010_685_MOESM3_ESM.ZIP
 
 
-##
 ## TESTING THE INSTALLATION AND EXAMPLE OUTPUT
-##
 
 The directory 'test/' includes data to enable you to test that NetNC
 is working correctly. 
@@ -446,9 +431,7 @@ NNCz10_FDR0pt1_mincutThresh0pt1.txt - The network of edges passing the minimum c
 				      (-log(p-value) previously calculated by NetNC).
 
 
-##
 ## Contributors and contact
-##
 
 The NetNC software distribution was developed by Ian Overton, Jeremy Owen (iterative 
 minimum cut) and Alex Lubbock (Gaussian Mixture Modelling).
@@ -457,9 +440,7 @@ NetNC is maintained by Ian Overton, who can be reached at: first_name_initial* d
 * substitute with i  
 Also see: go.qub.ac.uk/IanOverton
 
-##
 ## Citing NetNC
-##
 
 If you use any of the code in this NetNC software distribution please cite:
 Overton IM, Sims A, Owen JA, Heale B, Ford M, Lubbock ALR, Pairo-Castineira E, Essafi E (2020).'Functional 
