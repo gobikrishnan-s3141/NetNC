@@ -73,7 +73,7 @@ in the usage section, below.
 
 ## INSTALLATION
 
-1. Network Neighbourhood clustering - NetNC_v2pt2.pl
+**1. Network Neighbourhood clustering - NetNC_v2pt2.pl**
 
 a) The arbitary precision calculations require the perl module Math::Pari.
 Install this from cpan (www.cpan.org). For example from the command line:
@@ -95,12 +95,12 @@ NetNC_v2pt2.pl and FCS.pl scripts)
 The lines to edit in NetNC_v2pt2.pl are indicated with comments near to the start of the 
 script. NetNC has been tested with perl v5.16, v5.18, v5.20 and v5.26
 
-2. Iterative Minimum cut - itercut.py
+**2. Iterative Minimum cut - itercut.py**
 
 Install the dependencies: networkx>=1.8 and numpy 
 
-(itercut.py is verified to work with networkx >=1.8. Earlier versions are 
-not compatible)
+*(itercut.py is verified to work with networkx >=1.8. Earlier versions are 
+not compatible)*
 
 More information is given in mincut/MinCut_README.txt
 
@@ -111,7 +111,7 @@ to work on Mac OSX, Windows and with other recent versions of R.
 
 ## USAGE
 
-1. NetNC
+**1. NetNC**
 
 NetNC can be run with many possible combinations of options, here are some
 illustrative examples:
@@ -134,7 +134,7 @@ A help message is produced by running:
 NetNC_v2pt2.pl -h
 
 
-2. Iterative minimum cut
+**2. Iterative minimum cut**
 
 The iterative minimum cut is (optionally) called by NetNC_v2pt2.pl
 If you wish to run the iterative minimum cut as a stand-alone program, the basic
@@ -146,7 +146,7 @@ be used. The itercut.py help message is produced by running:
 python minCut/itercut.py 
 
 
-3. Node-centric analysis with Gaussian mixture modelling
+**3. Node-centric analysis with Gaussian mixture modelling**
 
 Node-centric analysis is intended to be (optionally) called by NetNC_v2pt2.pl
 This subsection describes components of the analysis that may be called separately. 
@@ -173,7 +173,7 @@ NFCS threshold value determined by this procedure (please the manuscript methods
 section for further details). Of course functions in netNCmix.R may also be 
 called directly.
 
-4. A note on networks for use with NetNC
+**4. A note on networks for use with NetNC**
 NetNC requires a network as input, provided using the -n option. This network defines the 
 context for the analysis, providing the structure that enables NetNC to discover relationships
 within the input node list. Network nodes may be genes and the input list should be a subset 
@@ -191,7 +191,7 @@ https://static-content.springer.com/esm/art%3A10.1186%2F1752-0509-5-68/MediaObje
 The directory 'test/' includes data to enable you to test that NetNC
 is working correctly. 
 
-1. The tests may be run as follows (from the netNC/ directory):
+**1. The tests may be run as follows (from the netNC/ directory):**
 
 a) Network Neighbourhood Clustering (NNC)
 ```
