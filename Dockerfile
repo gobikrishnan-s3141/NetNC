@@ -25,5 +25,5 @@ RUN wget https://staging2.inetbio.org/humannetv3/networks/HumanNet-FN.tsv
 
 RUN ls && pwd
 
-RUN  perl /usr/local/bin/NetNC/NetNC_v2pt2.pl -i HumanNet-FN.tsv -n test/test_genelist.txt -o test/exampleOutput/testrun-z 10 -F -M -l test/test_background_genelist.txt
+RUN  perl /usr/local/bin/NetNC/NetNC_v2pt2.pl -n HumanNet-FN.tsv -i test/test_genelist.txt -o test/exampleOutput/testrun-z 10 -F -M -l test/test_background_genelist.txt
 
