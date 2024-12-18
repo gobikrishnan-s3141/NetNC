@@ -28,5 +28,4 @@ COPY . .
 RUN cp -r /~/NetNC /usr/local/bin/
 
 # Run NetNC with test dataset
-RUN  perl /usr/local/bin/NetNC/NetNC_v2pt2.pl -n HumanNet-FN.tsv -i test/test_genelist.txt -o test/exampleOutput/testrun-z 10 -F -M -l test/test_background_genelist.txt
-
+RUN  perl /usr/local/bin/NetNC/NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/exampleOutput/testrun-z 10 -F -M -l test/test_background_genelist.txt
