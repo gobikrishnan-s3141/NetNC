@@ -1,3 +1,6 @@
+#!/usr/bin/env perl
+use v5.35;
+
 #    Copyright (C) 2018 Queen's University Belfast
 #
 #
@@ -18,7 +21,6 @@
 
 package NetNC;
 
-use strict;
 use Statistics::FishersExactTest;
 use Math::BigFloat;
 

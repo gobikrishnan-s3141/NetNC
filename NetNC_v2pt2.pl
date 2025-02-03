@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
-#
+use v5.35;
+
 # netNC defines focus networks based on network neigbourhood clustering
 # of induced subgraph (eg defined by ChIP-seq peaks or differential expression). 
 # P-value distributions are calculated for the induced subgraph and 
@@ -34,7 +35,6 @@ use lib "/usr/lib/perl5/site_perl/5.26.1/x86_64-linux-thread-multi";
 my $path_to_R = "/usr/bin/R";
 my $NetNC_home = "/usr/local/bin/NetNC/";
 
-use strict;
 use NetNC;
 use Statistics::FDR;
 use Getopt::Std;
@@ -104,6 +104,3 @@ $var->Statistics::FDR::FDR_threshold($fdr, $fg_p);
 $var->mixmod_mincut($NetNC_home, $path_to_R);
 
 exit; 
-
-
-

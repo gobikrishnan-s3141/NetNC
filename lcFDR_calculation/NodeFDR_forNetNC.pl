@@ -1,4 +1,5 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use v5.35;
 
 ##
 ## This script identifies the minimum pFDR value assigned to a node (gene) by analysing NetNC output files
@@ -23,8 +24,6 @@
 #   If not, see <http://www.gnu.org/licenses/>.
 #
 # v1.1
-
-use strict;
 
 my ($netnc, $fdr, $fcs) = @ARGV;
 

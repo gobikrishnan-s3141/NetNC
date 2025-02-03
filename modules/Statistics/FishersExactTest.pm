@@ -1,3 +1,6 @@
+#!/usr/bin/env perl
+use v5.35;
+
 =head1 NAME
 
 Statistics::FET - Fisher's Exact Test statistic (2x2 case)

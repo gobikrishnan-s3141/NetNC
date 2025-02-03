@@ -2,7 +2,7 @@
 FROM ubuntu:latest
 
 # install system dependencies
-RUN apt update && apt-get install -y --no-install-recommends build-essential \
+RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential \
         cpanminus \
         r-base \
         python3 \

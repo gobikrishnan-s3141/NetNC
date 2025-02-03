@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+use v5.35;
 
 ##
 ## Calculates the Functional Coherence Score for NetNC
@@ -22,9 +23,6 @@
 #    along with FCS.pl in the file LICENSE.txt
 #    If not, see <http://www.gnu.org/licenses/>.
 #
-
-use strict;
-
 
 my ($genelist, $netnc, $out) = @ARGV;
 die "usage [genelist] [NetNC results] [output]\n" unless $out;

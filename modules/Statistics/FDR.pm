@@ -1,3 +1,6 @@
+#!/usr/bin/env perl
+use v5.35;
+
 #    Copyright (C) 2018 Queen's University Belfast
 #
 #
@@ -24,8 +27,6 @@ package Statistics::FDR;
 
 #@author Ian Overton - i.overton@qub.ac.uk
 # v1.1
-
-use strict;
 
 ######
 #
