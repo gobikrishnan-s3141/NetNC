@@ -1,27 +1,45 @@
-# ubuntu LTS image
-FROM ubuntu:latest
+# Fedora base image - Fedora-41
+FROM fedora:41
+
+# metadata
+LABEL base_image="Fedora 41"
+LABEL version="1"
+LABEL about.summary="Network Neighbourhood Clustering"
+LABEL about.home="https://github.com/overton-group/NetNC"
+LABEL about.documentation="https://doi.org/10.3390/cancers12102823"
+LABEL about.license_file="https://github.com/overton-group/NetNC/blob/master/LICENSE.txt"
+LABEL about.license="GNU general public license (GPL) version 3"
+LABEL about.tags="Network biology,transcriptomics"
+
+# Environmental variables - NetNC home and build home
+ENV NETNC_HOME=~/NetNC \
+    BUILD_HOME=/build
 
 # install system dependencies
-RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential \
-        cpanminus \
-        r-base \
-        python3 \
-        python3-dev \
-        python3-pip \
-        python3-numpy \
-        python3-networkx \
-        perl \
-        pari-gp \
-        libpari-dev \
-        git \
-        wget && rm -rf /var/lib/apt/lists/*
+RUN dnf -y update && dnf -y upgrade && dnf install -y --setopt=install_weak_deps=False \
+    @development-tools \
+    wget \
+    curl \
+    zip \
+    R-core \
+    python3 \
+    python3-devel \
+    python3-pip \
+    python3-numpy \
+    python3-networkx \
+    perl \
+    pari \
+    pari-devel \
+    git \
+    zlib-devel && \
+    dnf clean all
 
 # install math::pari using cpanm
-RUN cpanm Math::Pari
+RUN cpan Math::Pari
 
 # workspace
-RUN mkdir ~/NetNC
-WORKDIR ~/NetNC
+RUN mkdir -p $NETNC_HOME 
+WORKDIR $NETNC_HOME
 
 # copy files into workspace
 COPY . .
