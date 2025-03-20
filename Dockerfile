@@ -12,12 +12,14 @@ LABEL about.license="GNU general public license (GPL) version 3"
 LABEL about.tags="Network biology,transcriptomics"
 
 # Environmental variables - NetNC home and build home
-ENV NETNC_HOME=/opt/NetNC \
-    BUILD_HOME=/build
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=UTC \
+    NETNC_HOME=/opt/NetNC
 
 # install system dependencies
 RUN apt update && apt-get install -y --no-install-recommends build-essential \
-        cpanminus \
+	cpanminus \
+	adduser \
         r-base \
         python3 \
         python3-dev \
@@ -31,10 +33,14 @@ RUN apt update && apt-get install -y --no-install-recommends build-essential \
         wget && rm -rf /var/lib/apt/lists/*
 
 # install math::pari using cpanm
-RUN cpan Math::Pari
+RUN cpanm Math::Pari
+
+# user
+ARG USERNAME=mamba
+RUN useradd -M -s /bin/bash -p '!' $USERNAME && usermod -a -G sudo $USERNAME
 
 # workspace
-RUN mkdir -p $NETNC_HOME 
+RUN mkdir -p $NETNC_HOME && chown -R $USERNAME:$USERNAME $NETNC_HOME 
 WORKDIR $NETNC_HOME
 
 # copy files into workspace
@@ -43,3 +49,4 @@ RUN cp -r /opt/NetNC /usr/local/bin/
 
 # Run NetNC with test dataset
 RUN perl NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/exampleOutput/PID/PID_NodeCent_z10 -z 100 -E -M -l test/test_background_genelist.txt
+CMD ["/bin/bash", "-c"]
