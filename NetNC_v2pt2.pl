@@ -31,7 +31,7 @@ use v5.35;
 #
 
 use lib '/usr/local/bin/NetNC/modules/';
-use lib "/usr/lib/perl5/site_perl/5.26.1/x86_64-linux-thread-multi";
+use lib '/home/g0bi/perl5/perlbrew/perls/perl-5.40.1/lib/5.40.1/Math';
 my $path_to_R = "/usr/bin/R";
 my $NetNC_home = "/usr/local/bin/NetNC/";
 
