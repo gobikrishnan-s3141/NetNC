@@ -71,4 +71,4 @@ RUN cp -r /opt/NetNC /usr/local/bin/
 
 # Run NetNC with test dataset
 RUN perl NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/exampleOutput/PID/PID_NodeCent_z10 -z 100 -E -M -l test/test_background_genelist.txt
-CMD ["/bin/bash", "-c"]
+CMD ["/bin/bash"]
