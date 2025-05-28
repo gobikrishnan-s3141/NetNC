@@ -2,9 +2,9 @@ name: NetNC CI
 
 on:
   push:
-    branches: [ "test-netnc" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "test-netnc" ]
+    branches: [ "master" ]
 
 jobs:
 
