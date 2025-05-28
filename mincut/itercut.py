@@ -25,29 +25,28 @@
 """
 
 import networkx as nx
-from networkx.algorithms.connectivity import minimum_st_edge_cut
 import sys, getopt
 
 def weighted_minimum_edge_cut(graph):
     """Performs the global minimum cut of a weighted graph and returns the cutset.
     Note that since the graph object is mutable this function has side-effects.
-
+    
     >>> import networkx as nx
     >>> g1 = nx.Graph([('A','B',{'weight':2}), ('B','C',{'weight':1}), ('A','C',{'weight':1})])
-    >>> weighted_minimum_edge_cut(g1) == {('A', 'C'), ('B', 'C')}
-    True
+    >>> sorted(weighted_minimum_edge_cut(g1))
+    [('A', 'C'), ('B', 'C')]
     >>> g2 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':2}), ('A','C',{'weight':1})])
-    >>> weighted_minimum_edge_cut(g2) == {('A', 'B'), ('A', 'C')}
-    True
+    >>> sorted(weighted_minimum_edge_cut(g2))
+    [('A', 'B'), ('A', 'C')]
     >>> g3 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':2})])
-    >>> weighted_minimum_edge_cut(g3) == {('A', 'B'), ('B', 'C')}
-    True
+    >>> sorted(weighted_minimum_edge_cut(g3))
+    [('A', 'B'), ('B', 'C')]
     >>> g4 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':1})])
-    >>> weighted_minimum_edge_cut(g4) == {('C', 'D')}
-    True
+    >>> weighted_minimum_edge_cut(g4)
+    {('C', 'D')}
     >>> g5 = nx.Graph([('A','B',{'weight':3}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':3})])
-    >>> weighted_minimum_edge_cut(g5) == {('A', 'C'), ('B', 'C')}
-    True
+    >>> sorted(weighted_minimum_edge_cut(g5))
+    [('A', 'C'), ('B', 'C')]
     """
     nodes = list(graph.nodes)
     if not nodes:
@@ -83,7 +82,7 @@ def iterative_minimum_cut(graph, cut_crit):
             cutset.update(cut)
         graph.remove_edges_from(cutset)
     return cutset
-
+    
 def density_cutoff(cutoff):
     def cut_crit(graph):
         if nx.density(graph) == 0.0:
@@ -96,17 +95,25 @@ def density_cutoff(cutoff):
 def highlight_graph(graph, clusters=None, pos=None, myprog='neato', cmap=None):
     import random
     if clusters is None:
-        clusters = [graph.nodes()]
+        clusters = [list(graph.nodes())]
+    else:
+        clusters = list(clusters)  # Convert generator to list
     random.shuffle(clusters)    
     indices = [clusters.index(cluster) for node in graph.nodes() 
                                        for cluster in clusters 
                                        if node in cluster]
     assert(len(indices) == len(graph.nodes()))
     try: 
-        if pos is None: pos = nx.graphviz_layout(graph, prog=myprog)
+        if pos is None:
+            try:
+                from networkx.drawing.nx_agraph import graphviz_layout
+                pos = graphviz_layout(graph, prog=myprog)
+            except ImportError:
+                pos = nx.spring_layout(graph, iterations=50)
     except:
-        if pos is None: pos = nx.spring_layout(graph,iterations=50)
-    nx.draw(graph,pos,node_color=indices,node_size=100,cmap=cmap,with_labels=False)
+        if pos is None: 
+            pos = nx.spring_layout(graph, iterations=50)
+    nx.draw(graph, pos, node_color=indices, node_size=100, cmap=cmap, with_labels=False)
 
 def main():
     '''
@@ -172,7 +179,7 @@ def main():
     nx.write_weighted_edgelist(G, output_file, delimiter='\t')
     if visualize:
         try:
-            clusters = nx.connected_components(G)
+            clusters = list(nx.connected_components(G))  # Convert to list
             G.add_edges_from(result)
             import matplotlib.pyplot as plt
             highlight_graph(G, clusters, cmap=plt.cm.gist_ncar)
@@ -180,6 +187,7 @@ def main():
         except:
             sys.exit(2)
     print("Mincut results file: " + output_file)
+    
     
 if __name__ == "__main__":
     import doctest
