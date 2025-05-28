@@ -30,7 +30,7 @@ import sys, getopt
 def weighted_minimum_edge_cut(graph):
     """Performs the global minimum cut of a weighted graph and returns the cutset.
     Note that since the graph object is mutable this function has side-effects.
-    
+
     >>> import networkx as nx
     >>> g1 = nx.Graph([('A','B',{'weight':2}), ('B','C',{'weight':1}), ('A','C',{'weight':1})])
     >>> sorted(weighted_minimum_edge_cut(g1))
@@ -48,6 +48,7 @@ def weighted_minimum_edge_cut(graph):
     >>> sorted(weighted_minimum_edge_cut(g5))
     [('A', 'C'), ('B', 'C')]
     """
+
     nodes = list(graph.nodes)
     if not nodes:
         return set()
@@ -55,16 +56,16 @@ def weighted_minimum_edge_cut(graph):
     best_cut = set()
     best_cost = float('inf')
     for t in nodes[1:]:
-        cut_value, partition = nx.minimum_cut(graph, s, t, capacity='weight')
-        cut_edges = set()
+        this_cut, partition = nx.minimum_cut(graph, s, t, capacity='weight')
+        this_cost = set()
         for u, v, data in graph.edges(data=True):
             if (u in partition[0] and v in partition[1]) or (u in partition[1] and v in partition[0]):
-                cut_edges.add(tuple(sorted((u, v))))
-        if cut_value < best_cost:
-            best_cut = cut_edges
-            best_cost = cut_value
-        elif cut_value == best_cost and not best_cut:
-            best_cut = cut_edges
+                this_cost.add(tuple(sorted((u, v))))
+        if this_cut < best_cost:
+            best_cut = this_cost
+            best_cost = this_cut
+        elif this_cut == best_cost and not best_cut:
+            best_cut = this_cost
     return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
@@ -72,65 +73,54 @@ def iterative_minimum_cut(graph, cut_crit):
     fail to satisfy cut_crit. Also this function has side-effects (changes the input graph).
     """
     cutset = set()
-    while True:
-        components = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
-        components_to_cut = [comp for comp in components if cut_crit(comp)]
-        if not components_to_cut:
-            break
-        for component in components_to_cut:
-            cut = weighted_minimum_edge_cut(component)
-            cutset.update(cut)
+    while 1:
+        components = list(filter(cut_crit, [graph.subgraph(c).copy() for c in nx.connected_components(graph)]))
+        if len(components) == 0: break
+        for component in components:
+            cutset.update(weighted_minimum_edge_cut(component))
         graph.remove_edges_from(cutset)
     return cutset
-    
+
 def density_cutoff(cutoff):
     def cut_crit(graph):
         if nx.density(graph) == 0.0:
             return False
         if nx.density(graph) >= cutoff:
             return False
-        return True 
+        return True
     return cut_crit
-    
+
 def highlight_graph(graph, clusters=None, pos=None, myprog='neato', cmap=None):
     import random
     if clusters is None:
-        clusters = [list(graph.nodes())]
-    else:
-        clusters = list(clusters)  # Convert generator to list
-    random.shuffle(clusters)    
-    indices = [clusters.index(cluster) for node in graph.nodes() 
-                                       for cluster in clusters 
+        clusters = [graph.nodes()]
+    random.shuffle(clusters)
+    indices = [clusters.index(cluster) for node in graph.nodes()
+                                       for cluster in clusters
                                        if node in cluster]
     assert(len(indices) == len(graph.nodes()))
-    try: 
-        if pos is None:
-            try:
-                from networkx.drawing.nx_agraph import graphviz_layout
-                pos = graphviz_layout(graph, prog=myprog)
-            except ImportError:
-                pos = nx.spring_layout(graph, iterations=50)
+    try:
+        if pos is None: pos = nx.graphviz_layout(graph, prog=myprog)
     except:
-        if pos is None: 
-            pos = nx.spring_layout(graph, iterations=50)
-    nx.draw(graph, pos, node_color=indices, node_size=100, cmap=cmap, with_labels=False)
+        if pos is None: pos = nx.spring_layout(graph,iterations=50)
+    nx.draw(graph,pos,node_color=indices,node_size=100,cmap=cmap,with_labels=False)
 
 def main():
     '''
-    USAGE: itercut.py -i [graphfile.txt] -o [outputfile.txt] 
+    USAGE: itercut.py -i [graphfile.txt] -o [outputfile.txt]
     -t [density threshold value] [-v] [-h]
-    
+
     Mandatory arguments:
     -i: name of input graph file (table of edges, tab-delimited)
     
-    Optional arguments:    
+    Optional arguments:
     -o: name of output file (default = input name with _OUT appended)
     -t: threshold density value for iterative cut algorithm (default = 0.1)
-    -v: output a PNG showing the graph with nodes colored by predicted pathway 
+    -v: output a PNG showing the graph with nodes colored by predicted pathway
     (requires matplotlib)
     -c: output a file with the edges cut by the algorithm
-    -h: print this help message 
-    '''    
+    -h: print this help message
+    '''
     graph_file = None
     output_file = None
     visualize = False
@@ -165,7 +155,7 @@ def main():
         name_core = ".".join(graph_file.split(".")[:-1])
         output_file = name_core + "_OUT" + ".txt"
     else:
-        name_core = ".".join(output_file.split(".")[:-1]) 
+        name_core = ".".join(output_file.split(".")[:-1])
     try:
         G = nx.read_weighted_edgelist(graph_file)
     except:
@@ -179,7 +169,7 @@ def main():
     nx.write_weighted_edgelist(G, output_file, delimiter='\t')
     if visualize:
         try:
-            clusters = list(nx.connected_components(G))  # Convert to list
+            clusters = nx.connected_components(G)
             G.add_edges_from(result)
             import matplotlib.pyplot as plt
             highlight_graph(G, clusters, cmap=plt.cm.gist_ncar)
@@ -187,8 +177,8 @@ def main():
         except:
             sys.exit(2)
     print("Mincut results file: " + output_file)
-    
-    
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
