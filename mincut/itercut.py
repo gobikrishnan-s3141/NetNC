@@ -61,11 +61,9 @@ def weighted_minimum_edge_cut(graph):
         for u, v, data in graph.edges(data=True):
             if (u in partition[0] and v in partition[1]) or (u in partition[1] and v in partition[0]):
                 this_cost.add(tuple(sorted((u, v))))
-        if this_cut < best_cost:
-            best_cut = this_cost
-            best_cost = this_cut
-        elif this_cut == best_cost and not best_cut:
-            best_cut = this_cost
+        if this_cost <= best_cost:
+            best_cut = this_cut
+            best_cost = this_cost
     return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
@@ -73,7 +71,7 @@ def iterative_minimum_cut(graph, cut_crit):
     fail to satisfy cut_crit. Also this function has side-effects (changes the input graph).
     """
     cutset = set()
-    while 1:
+    while True:
         components = list(filter(cut_crit, [graph.subgraph(c).copy() for c in nx.connected_components(graph)]))
         if len(components) == 0: break
         for component in components:
