@@ -22,7 +22,7 @@ ARG NETWORKX_VER=3.4.2
 ARG NUMPY_VER=2.2.5
 
 # install system dependencies
-RUN apt update && apt-get install -y --no-install-recommends build-essential \
+RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential \
 	cpanminus \
         r-base \
         python3 \
