@@ -53,19 +53,18 @@ def weighted_minimum_edge_cut(graph):
     if not nodes:
         return set()
     s = nodes[0]
+    
     best_cut = set()
     best_cost = float('inf')
     for t in nodes[1:]:
-        this_cut, partition = nx.minimum_cut(graph, s, t, capacity='weight')
-        this_cost = set()
-        for u, v, data in graph.edges(data=True):
-            if (u in partition[0] and v in partition[1]) or (u in partition[1] and v in partition[0]):
-                this_cost.add(tuple(sorted((u, v))))
+        if t is s: continue
+            this_cut = nx.minimum_st_edge_cut(graph,s,t,capacity='weight')
+            this_cost = sum(graph[u][v]['weight'] for u, v in this_cut)
         if this_cost <= best_cost:
             best_cut = this_cut
             best_cost = this_cost
     return best_cut
-
+        
 def iterative_minimum_cut(graph, cut_crit):
     """Iteratively cuts the input graph until all the 'cut products' (connected subgraphs)
     fail to satisfy cut_crit. Also this function has side-effects (changes the input graph).
