@@ -33,38 +33,31 @@ def weighted_minimum_edge_cut(graph):
 
     >>> import networkx as nx
     >>> g1 = nx.Graph([('A','B',{'weight':2}), ('B','C',{'weight':1}), ('A','C',{'weight':1})])
-    >>> sorted(weighted_minimum_edge_cut(g1))
-    [('A', 'C'), ('B', 'C')]
     >>> g2 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':2}), ('A','C',{'weight':1})])
-    >>> sorted(weighted_minimum_edge_cut(g2))
-    [('A', 'B'), ('A', 'C')]
     >>> g3 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':2})])
-    >>> sorted(weighted_minimum_edge_cut(g3))
-    [('A', 'B'), ('B', 'C')]
+    >>> weighted_minimum_edge_cut(g1)
+    {('B', 'C'), ('A', 'C')}
+    >>> weighted_minimum_edge_cut(g2)
+    {('A', 'B'), ('A', 'C')}
+    >>> weighted_minimum_edge_cut(g3)
+    {('A', 'B'), ('C', 'B')}
     >>> g4 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':1})])
     >>> weighted_minimum_edge_cut(g4)
     {('C', 'D')}
     >>> g5 = nx.Graph([('A','B',{'weight':3}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':3})])
-    >>> sorted(weighted_minimum_edge_cut(g5))
-    [('A', 'C'), ('B', 'C')]
+    >>> weighted_minimum_edge_cut(g5)
+    {('B', 'C'), ('A', 'C')}
     """
+    list(graph.nodes)[0]
+    cut_value, partition = nx.stoer_wagner(graph, weight='weight')
+    reachable, non_reachable = partition
+    this_cut = set()
+    for u in reachable:
+        for v in graph[u]:
+            if v in non_reachable:
+                this_cut.add((u, v))
+    return this_cut
 
-    nodes = list(graph.nodes)
-    if not nodes:
-        return set()
-    s = nodes[0]
-    
-    best_cut = set()
-    best_cost = float('inf')
-    for t in nodes[1:]:
-        if t is s: continue
-            this_cut = nx.minimum_st_edge_cut(graph,s,t,capacity='weight')
-            this_cost = sum(graph[u][v]['weight'] for u, v in this_cut)
-        if this_cost <= best_cost:
-            best_cut = this_cut
-            best_cost = this_cost
-    return best_cut
-        
 def iterative_minimum_cut(graph, cut_crit):
     """Iteratively cuts the input graph until all the 'cut products' (connected subgraphs)
     fail to satisfy cut_crit. Also this function has side-effects (changes the input graph).
