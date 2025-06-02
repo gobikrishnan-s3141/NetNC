@@ -48,15 +48,23 @@ def weighted_minimum_edge_cut(graph):
     >>> weighted_minimum_edge_cut(g5)
     {('B', 'C'), ('A', 'C')}
     """
-    list(graph.nodes)[0]
-    cut_value, partition = nx.stoer_wagner(graph, weight='weight')
-    reachable, non_reachable = partition
-    this_cut = set()
-    for u in reachable:
-        for v in graph[u]:
-            if v in non_reachable:
-                this_cut.add((u, v))
-    return this_cut
+    s = list(graph.nodes)[0]
+    best_cut = set()
+    best_cost = float('inf')
+    for t in graph.nodes():
+        if t == s: continue
+        this_cost, partition = nx.minimum_cut(graph, s, t, capacity='weight')
+        reachable, non_reachable = partition
+        this_cut = set()
+        for u in reachable:
+            for v in graph[u]:
+                if v in non_reachable:
+                    this_cut.add((u, v))
+                    this_cost = sum(graph.edges[u, v]['weight'] for u, v in this_cut)
+        if this_cost < best_cost:
+            best_cost = this_cost
+            best_cut = this_cut
+    return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
     """Iteratively cuts the input graph until all the 'cut products' (connected subgraphs)
