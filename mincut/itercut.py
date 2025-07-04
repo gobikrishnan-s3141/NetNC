@@ -23,9 +23,11 @@
 @author: Jeremy A. Owen
 @author: Ian Overton
 """
-
 import networkx as nx
-import sys, getopt
+import sys
+import getopt
+from networkx.algorithms import flow  # Import the flow submodule
+
 
 def weighted_minimum_edge_cut(graph):
     """Performs the global minimum cut of a weighted graph and returns the cutset.
@@ -33,37 +35,38 @@ def weighted_minimum_edge_cut(graph):
 
     >>> import networkx as nx
     >>> g1 = nx.Graph([('A','B',{'weight':2}), ('B','C',{'weight':1}), ('A','C',{'weight':1})])
+    >>> weighted_minimum_edge_cut(g1) == {('A', 'C'), ('B', 'C')}
+    True
     >>> g2 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':2}), ('A','C',{'weight':1})])
+    >>> weighted_minimum_edge_cut(g2) == {('A', 'B'), ('A', 'C')}
+    True
     >>> g3 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':2})])
-    >>> weighted_minimum_edge_cut(g1)
-    {('B', 'C'), ('A', 'C')}
-    >>> weighted_minimum_edge_cut(g2)
-    {('A', 'B'), ('A', 'C')}
-    >>> weighted_minimum_edge_cut(g3)
-    {('A', 'B'), ('C', 'B')}
+    >>> weighted_minimum_edge_cut(g3) == {('A', 'B'), ('B', 'C')}
+    True
     >>> g4 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':1})])
-    >>> weighted_minimum_edge_cut(g4)
-    {('C', 'D')}
+    >>> weighted_minimum_edge_cut(g4) == {('C', 'D')}
+    True
     >>> g5 = nx.Graph([('A','B',{'weight':3}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':3})])
-    >>> weighted_minimum_edge_cut(g5)
-    {('B', 'C'), ('A', 'C')}
+    >>> weighted_minimum_edge_cut(g5) == {('A', 'C'), ('B', 'C')}
+    True
     """
-    s = list(graph.nodes)[0]
+    nodes = list(graph.nodes)
+    if not nodes:
+        return set()
+    s = nodes[0]
     best_cut = set()
     best_cost = float('inf')
-    for t in graph.nodes():
-        if t == s: continue
-        this_cost, partition = nx.minimum_cut(graph, s, t, capacity='weight')
-        reachable, non_reachable = partition
-        this_cut = set()
-        for u in reachable:
-            for v in graph[u]:
-                if v in non_reachable:
-                    this_cut.add((u, v))
-                    this_cost = sum(graph.edges[u, v]['weight'] for u, v in this_cut)
-        if this_cost < best_cost:
-            best_cost = this_cost
-            best_cut = this_cut
+    for t in nodes[1:]:
+        cut_value, partition = flow.minimum_cut(graph, s, t, capacity='weight')
+        cut_edges = set()
+        for u, v, data in graph.edges(data=True):
+            if (u in partition[0] and v in partition[1]) or (u in partition[1] and v in partition[0]):
+                cut_edges.add(tuple(sorted((u, v))))
+        if cut_value < best_cost:
+            best_cut = cut_edges
+            best_cost = cut_value
+        elif cut_value == best_cost and not best_cut:
+            best_cut = cut_edges
     return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
@@ -72,53 +75,67 @@ def iterative_minimum_cut(graph, cut_crit):
     """
     cutset = set()
     while True:
-        components = list(filter(cut_crit, [graph.subgraph(c).copy() for c in nx.connected_components(graph)]))
-        if len(components) == 0: break
-        for component in components:
-            cutset.update(weighted_minimum_edge_cut(component))
+        components = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
+        components_to_cut = [comp for comp in components if cut_crit(comp)]
+        if not components_to_cut:
+            break
+        for component in components_to_cut:
+            cut = weighted_minimum_edge_cut(component)
+            cutset.update(cut)
         graph.remove_edges_from(cutset)
     return cutset
 
+
 def density_cutoff(cutoff):
     def cut_crit(graph):
-        if nx.density(graph) == 0.0:
+        if not graph.number_of_edges():
             return False
-        if nx.density(graph) >= cutoff:
+        density = nx.density(graph)
+        if density == 0.0:
+            return False
+        if density >= cutoff:
             return False
         return True
+
     return cut_crit
+
 
 def highlight_graph(graph, clusters=None, pos=None, myprog='neato', cmap=None):
     import random
     if clusters is None:
-        clusters = [graph.nodes()]
+        clusters = [list(graph.nodes)]
     random.shuffle(clusters)
-    indices = [clusters.index(cluster) for node in graph.nodes()
-                                       for cluster in clusters
-                                       if node in cluster]
-    assert(len(indices) == len(graph.nodes()))
+    node_colors = {}
+    for i, cluster in enumerate(clusters):
+        for node in cluster:
+            node_colors[node] = i
+    indices = [node_colors[node] for node in graph.nodes]
+
     try:
-        if pos is None: pos = nx.graphviz_layout(graph, prog=myprog)
-    except:
-        if pos is None: pos = nx.spring_layout(graph,iterations=50)
-    nx.draw(graph,pos,node_color=indices,node_size=100,cmap=cmap,with_labels=False)
+        if pos is None:
+            pos = nx.nx_agraph.graphviz_layout(graph, prog=myprog)
+    except ImportError:
+        if pos is None:
+            pos = nx.spring_layout(graph, iterations=50)
+    nx.draw(graph, pos, node_color=indices, node_size=100, cmap=cmap, with_labels=False)
+
 
 def main():
-    '''
+    """
     USAGE: itercut.py -i [graphfile.txt] -o [outputfile.txt]
     -t [density threshold value] [-v] [-h]
 
     Mandatory arguments:
     -i: name of input graph file (table of edges, tab-delimited)
-    
+
     Optional arguments:
     -o: name of output file (default = input name with _OUT appended)
     -t: threshold density value for iterative cut algorithm (default = 0.1)
     -v: output a PNG showing the graph with nodes colored by predicted pathway
-    (requires matplotlib)
+    (requires matplotlib and pygraphviz or pydot)
     -c: output a file with the edges cut by the algorithm
     -h: print this help message
-    '''
+    """
     graph_file = None
     output_file = None
     visualize = False
@@ -155,29 +172,43 @@ def main():
     else:
         name_core = ".".join(output_file.split(".")[:-1])
     try:
-        G = nx.read_weighted_edgelist(graph_file)
-    except:
+        G = nx.read_weighted_edgelist(graph_file, delimiter='\t')
+    except FileNotFoundError:
+        print(f"Error: Input graph file '{graph_file}' not found.")
         sys.exit(2)
-    result = iterative_minimum_cut(G, density_cutoff(cutoff))
+    except Exception as e:
+        print(f"Error reading graph file: {e}")
+        sys.exit(2)
+
+    result = iterative_minimum_cut(G.copy(), density_cutoff(cutoff))  # Operate on a copy
+
     if write_cutset:
-        outfile = open(name_core + "_CUTSET" + ".txt",'w')
+        outfile = open(name_core + "_CUTSET" + ".txt", 'w')
         for edge in result:
             outfile.write("%s\n" % str(edge))
         outfile.close()
     nx.write_weighted_edgelist(G, output_file, delimiter='\t')
     if visualize:
         try:
-            clusters = nx.connected_components(G)
-            G.add_edges_from(result)
+            clusters = list(nx.connected_components(G))
+            G_visual = G.copy()
+            G_visual.add_edges_from(result, weight=0)  # Add cut edges for visualization
             import matplotlib.pyplot as plt
-            highlight_graph(G, clusters, cmap=plt.cm.gist_ncar)
+
+            highlight_graph(G_visual, clusters, cmap=plt.cm.gist_ncar)
             plt.savefig(name_core + ".png")
-        except:
-            sys.exit(2)
-    print("Mincut results file: " + output_file)
+        except ImportError:
+            print("Warning: matplotlib is required for visualization (-v option). Please install it.")
+        except nx.NetworkXUnfeasible:
+            print("Warning: Graph layout failed. Visualization may not be accurate.")
+        except Exception as e:
+            print(f"Error during visualization: {e}")
+
+    print(("Mincut results file: " + output_file))
 
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
     main()
