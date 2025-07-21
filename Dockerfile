@@ -56,9 +56,8 @@ ARG USERNAME=mamba
 RUN useradd -M -s /bin/bash -p '!' $USERNAME && usermod -a -G sudo $USERNAME
 
 # workspace
-RUN mkdir -p $NETNC_HOME && chown -R $USERNAME:$USERNAME $NETNC_HOME 
+RUN git clone https://github.com/gobikrishnan-s3141/NetNC.git /opt/NetNNC && cd NetNC
 WORKDIR $NETNC_HOME
-RUN git clone https://github.com/gobikrishnan-s3141/NetNC.git && cd NetNC
 
 # copy files into workspace
 # COPY . .
