@@ -58,9 +58,10 @@ RUN useradd -M -s /bin/bash -p '!' $USERNAME && usermod -a -G sudo $USERNAME
 # workspace
 RUN mkdir -p $NETNC_HOME && chown -R $USERNAME:$USERNAME $NETNC_HOME 
 WORKDIR $NETNC_HOME
+RUN git clone https://github.com/gobikrishnan-s3141/NetNC.git && cd NetNC
 
 # copy files into workspace
-COPY . .
+# COPY . .
 RUN cp -r /opt/NetNC /usr/local/bin/
 RUN chmod +x /usr/local/bin/NetNC/FCS.pl
 
