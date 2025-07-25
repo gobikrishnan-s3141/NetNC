@@ -53,20 +53,12 @@ def weighted_minimum_edge_cut(graph):
     nodes = list(graph.nodes)
     if not nodes:
         return set()
-    s = nodes[0]
+    cut_value, partition = nx.stoer_wagner(graph, weight='weight')
+    set1, set2 = partition
     best_cut = set()
-    best_cost = float('inf')
-    for t in nodes[1:]:
-        cut_value, partition = flow.minimum_cut(graph, s, t, capacity='weight')
-        cut_edges = set()
-        for u, v, data in graph.edges(data=True):
-            if (u in partition[0] and v in partition[1]) or (u in partition[1] and v in partition[0]):
-                cut_edges.add(tuple(sorted((u, v))))
-        if cut_value < best_cost:
-            best_cut = cut_edges
-            best_cost = cut_value
-        elif cut_value == best_cost and not best_cut:
-            best_cut = cut_edges
+    for u, v in graph.edges():
+        if (u in set1 and v in set2) or (v in set1 and u in set2):
+            best_cut.add((u, v))
     return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
@@ -144,14 +136,14 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hi:o:t:vc", ["help"])
     except getopt.GetoptError as err:
-        print(str(err))
-        print(main.__doc__)
+        print((str(err)))
+        print((main.__doc__))
         sys.exit(2)
     for opt, val in opts:
         if opt == "-i":
             graph_file = val
         elif opt in ("-h", "--help"):
-            print(main.__doc__)
+            print((main.__doc__))
             sys.exit()
         elif opt == "-o":
             output_file = val
@@ -164,7 +156,7 @@ def main():
         else:
             assert False, "unhandled option"
     if graph_file is None:
-        print(main.__doc__)
+        print((main.__doc__))
         sys.exit(2)
     if output_file is None:
         name_core = ".".join(graph_file.split(".")[:-1])
