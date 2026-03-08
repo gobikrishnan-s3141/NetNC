@@ -24,16 +24,16 @@ ARG NUMPY_VER=2.2.5
 # install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
 	cpanminus \
-        r-base \
-        python3 \
-        python3-dev \
-        python3-pip \
-        perl \
-        pari-gp \
-        libpari-dev \
-        git \
+    r-base \
+    python3 \
+    python3-dev \
+    python3-pip \
+    perl \
+    pari-gp \
+    libpari-dev \
+    git \
 	neovim \
-        wget && rm -rf /var/lib/apt/lists/*
+    wget && rm -rf /var/lib/apt/lists/*
 
 # install math::pari using cpanm
 RUN cpanm Math::Pari
