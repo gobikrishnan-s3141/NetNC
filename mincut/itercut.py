@@ -37,7 +37,7 @@ def weighted_minimum_edge_cut(graph):
     >>> g3 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':2})])
     >>> g4 = nx.Graph([('A','B',{'weight':1}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':1})])
     >>> g5 = nx.Graph([('A','B',{'weight':3}), ('B','C',{'weight':1}), ('A','C',{'weight':1}),('C','D',{'weight':3})])
-    >>> weighted_minimum_edge_cut(g1) == {('A', 'C'), ('B', 'C')}  # {} <-- set([])
+    >>> weighted_minimum_edge_cut(g1) == {('B', 'C'), ('A', 'C')}  # {} <-- set([])
     True
     >>> weighted_minimum_edge_cut(g2) == {('A', 'B'), ('A', 'C')}
     True
@@ -48,18 +48,13 @@ def weighted_minimum_edge_cut(graph):
     >>> weighted_minimum_edge_cut(g5) == {('B', 'C'), ('A', 'C')}
     True
     """
-    s = graph.nodes()
-    best_cut = []
-    best_cost = float('inf')  # float is not subscriptable 
-    for t in graph.nodes():
-        if t is s: continue
-        this_cut, partition = nx.stoer_wagner(graph, weight='weight')
-        part1, part2 = partition
-        best_cut = set()
-        for u, v in graph.edges():
-            if (u in part1 and v in part2) or (u in part2 and v in part1):
-                best_cut.add((u,v))
-        return best_cut
+    cut_value, partition = nx.stoer_wagner(graph) # Stoer-Wagner <-- Flow-based minimum cut algorithm
+    part1, part2 = partition
+    best_cut = set()
+    for u, v in graph.edges():
+        if (u in part1 and v in part2) or (u in part2 and v in part1):
+            best_cut.add((u, v))
+    return best_cut
 
 def iterative_minimum_cut(graph, cut_crit):
     """Iteratively cuts the input graph until all the 'cut products' (connected subgraphs)
@@ -67,11 +62,13 @@ def iterative_minimum_cut(graph, cut_crit):
     """
     cutset = set()
     while 1:
-        components = list(filter(cut_crit, (graph.subgraph(c) for c in nx.connected_components(graph))))  # connected_component_subgraphs --> connected_components - deprecated (2.1)
+        components = list(filter(cut_crit, (graph.subgraph(c) for c in nx.connected_components(graph))))  # connected_components <-- connected_component_subgraphs - deprecated networkx > 2.1
         if len(components) == 0: break
+        new_cuts = set()
         for component in components:
-            cutset.update(weighted_minimum_edge_cut(component))
-        graph.remove_edges_from(cutset)
+            new_cuts.update(weighted_minimum_edge_cut(component))
+        graph.remove_edges_from(new_cuts)
+        cutset.update(new_cuts)
     return cutset
 
 def density_cutoff(cutoff):

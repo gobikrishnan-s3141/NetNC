@@ -15,55 +15,36 @@ LABEL about.tags="Network biology,transcriptomics"
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=UTC \
     NETNC_HOME=/opt/NetNC
-ARG CONDA_VER=latest
-ARG OS_TYPE=x86_64
-ARG PY_VER=3.12
-ARG NETWORKX_VER=3.4.2
-ARG NUMPY_VER=2.2.5
 
 # install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
-	cpanminus \
-    r-base \
-    python3 \
-    python3-dev \
-    python3-pip \
-    perl \
-    pari-gp \
-    libpari-dev \
-    git \
-	neovim \
-    wget && rm -rf /var/lib/apt/lists/*
+  cpanminus \
+  r-base \
+  python3 \
+  python3-dev \
+  python3-pip \
+  perl \
+  pari-gp \
+  libpari-dev \
+  git \
+  neovim \
+  wget && rm -rf /var/lib/apt/lists/*
 
-# install math::pari using cpanm
-RUN cpanm Math::Pari
-
-# Install miniforge to /opt/miniforge
-RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-RUN bash Miniforge3.sh -b -p /opt/conda
-RUN rm Miniforge3.sh
-ENV PATH="/opt/conda/bin:${PATH}"
-RUN conda update -y conda
-RUN conda init
-
-# Install packages from conda 
-RUN conda install -c conda-forge -y python=${PY_VER} \
-    networkx=${NETWORKX_VER} \
-    numpy=${NUMPY_VER}
-
-# user
-ARG USERNAME=mamba
-RUN useradd -M -s /bin/bash -p '!' $USERNAME && usermod -a -G sudo $USERNAME
+# install math::pari using cpanm; -std=gnu89 required for pari-2.3.5 K&R function pointers
+RUN CFLAGS="-std=gnu89" cpanm --notest Math::Pari
 
 # workspace
 RUN git clone https://github.com/gobikrishnan-s3141/NetNC.git /opt/NetNC
 WORKDIR $NETNC_HOME
 
+# uv installation
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN uv venv --python 3.13 .venv && uv pip install numpy networkx
+
 # copy files into workspace
-# COPY . .
 RUN cp -r /opt/NetNC /usr/local/bin/
 RUN chmod +x /usr/local/bin/NetNC/FCS.pl
 
-# Run NetNC with test dataset
+# Run NetNC with test dataset (Replace this line pointing to your own dataset & analysis modes either Pathway Identification or Functional Target Identification mode)
 RUN perl NetNC_v2pt2.pl -n test/network/test_net.txt -i test/test_genelist.txt -o test/exampleOutput/PID/PID_NodeCent_z10 -z 100 -E -M -l test/test_background_genelist.txt
 CMD ["/bin/bash"]
